@@ -1,47 +1,33 @@
 import { useState } from "react";
-import { Button,  Checkbox,  CloseButton, ListItem, OrderedList, HStack,Stack, Text, Textarea, } from "@chakra-ui/react"
+import { Button,  Checkbox,  CloseButton, ListItem, OrderedList,
+     HStack,Stack, Text, Textarea, } from "@chakra-ui/react"
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, completedTodo, deleteTodo, } from "../features/todoSlice";
+import { RootState } from "../App/store";
 
-interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
-}
-    
-    const Todos: Todo[] = [
-
-    {id: 1, text: "TypeScript", completed: false},
-   
-]
 
 
 function TodoList(){
 
-    const [todos,setTodos] = useState(Todos);
+    const dispatch  = useDispatch();
+    const todos = useSelector((state: RootState) => state.todo.todos)
     const [textInput,setTextInput] = useState('');
 
-    //console.log(todos)
-
-    const addTodo = () =>{
-        if(textInput.trim()){
-            const newTodo: Todo = {
-                id:todos.length+1,
-                text:textInput,
-                completed:false          
-            }
-            setTodos([...todos,newTodo])
+    const handleAddTodo = () => {
+        if(textInput.trim() !== ""){
+            dispatch(addTodo(textInput.trim()));
             setTextInput('')
         }
-    }
-    const deleteTodo =(id:number) =>{
-        setTodos(todos.filter((todo)=>todo.id !== id))
+      };
+    
+      const handleDeleteTodo = (id: number) => {
+        dispatch(deleteTodo(id));
+      };
+    
+      const handleCompletedTodo = (id: number) => {
+        dispatch(completedTodo(id));
+      }
 
-    }
-
-    const completedTodo = (id:number)  => {
-        setTodos(todos.map((todo)=>
-            todo.id === id ? {...todo, completed: !todo.completed } : todo
-        ))
-    }
     return(
         
     <Stack  spacing={10} textAlign="center">
@@ -55,7 +41,7 @@ function TodoList(){
         
         />
         <Button color='whiteSmoke' fontSize='2.2rem' borderRadius={20} background='teal'
-           onClick={addTodo}> 
+           onClick={handleAddTodo}> 
            Add Todo
   </Button>
 
@@ -64,7 +50,8 @@ function TodoList(){
      return(
         <HStack key={todo.id} style={{display:"flex",justifyContent:"center"}}>
         <ListItem style = {{ textDecoration: todo.completed ? 'line-through' : 'none',fontSize:"2.5rem" }} >{todo.text}</ListItem>
-        <CloseButton  color='whiteSmoke' background='teal' fontSize="2rem"  onClick={() => deleteTodo(todo.id)}></CloseButton>
+        <CloseButton  color='whiteSmoke' background='teal' fontSize="2rem" 
+         onClick={() => handleDeleteTodo(todo.id)}></CloseButton>
         <Checkbox
        _checked={{
        
@@ -72,7 +59,7 @@ function TodoList(){
       color="red"
       fontSize="2rem"
       isChecked={todo.completed}
-      onChange={()=>completedTodo(todo.id)}
+      onChange={() => handleCompletedTodo(todo.id)}
     >
       <Text color='blue'>Checked</Text>
     </Checkbox>
