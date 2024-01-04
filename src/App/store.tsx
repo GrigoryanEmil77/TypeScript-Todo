@@ -1,7 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-//import logger from 'redux-logger';
 import todoReducer from '../features/todoSlice';
-
 
 export const store = configureStore({
   reducer: {
