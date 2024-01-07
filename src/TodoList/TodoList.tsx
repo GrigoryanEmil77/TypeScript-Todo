@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button,  Checkbox,  CloseButton, ListItem, OrderedList,
      HStack,Stack, Text, Textarea, } from "@chakra-ui/react"
 import { useDispatch, useSelector } from "react-redux";
-import { addTodo, completedTodo, deleteTodo, } from "../features/todoSlice";
-import { RootState } from "../App/store";
-
+import { fetchTodo, addTodo,completedTodo, deleteTodo} from '../features/todoSlice';
+import { RootState} from "../App/store";
 
 
 function TodoList(){
@@ -13,21 +12,26 @@ function TodoList(){
     const todos = useSelector((state: RootState) => state.todo.todos)
     const [textInput,setTextInput] = useState('');
 
+    useEffect(() => {
+      dispatch(fetchTodo(10) as any); 
+    }, [dispatch]);
+  
     const handleAddTodo = () => {
-        if(textInput.trim() !== ""){
-            dispatch(addTodo(textInput.trim()));
-            setTextInput('')
-        }
-      };
-    
-      const handleDeleteTodo = (id: number) => {
-        dispatch(deleteTodo(id));
-      };
-    
-      const handleCompletedTodo = (id: number) => {
-        dispatch(completedTodo(id));
+      if(textInput.trim() !== ""){
+          dispatch(addTodo(textInput.trim()));
+          setTextInput('')
       }
+    };
+  
+    const handleCompletedTodo = (id: number) => {
+      dispatch(completedTodo(id));
+    };
+  
+    const handleDeleteTodo = (id: number) => {
+      dispatch(deleteTodo(id));
+    };
 
+   
     return(
         
     <Stack  spacing={10} textAlign="center">
@@ -49,19 +53,20 @@ function TodoList(){
    <OrderedList>{todos.map((todo)=>{
      return(
         <HStack key={todo.id} style={{display:"flex",justifyContent:"center"}}>
-        <ListItem style = {{ textDecoration: todo.completed ? 'line-through' : 'none',fontSize:"2.5rem" }} >{todo.text}</ListItem>
+        <ListItem style = {{ textDecoration: todo.completed ? 'line-through' : 'none',fontSize:"2.5rem" }} >
+          {todo.title}</ListItem>
         <CloseButton  color='whiteSmoke' background='teal' fontSize="2rem" 
          onClick={() => handleDeleteTodo(todo.id)}></CloseButton>
         <Checkbox
-       _checked={{
+        _checked={{
        
-       }}
-      color="red"
-      fontSize="2rem"
-      isChecked={todo.completed}
-      onChange={() => handleCompletedTodo(todo.id)}
-    >
-      <Text color='blue'>Checked</Text>
+        }}
+        color="red"
+        fontSize="2rem"
+        isChecked={todo.completed}
+        onChange={() => handleCompletedTodo(todo.id)}
+        >
+       <Text color='blue'>Checked</Text>
     </Checkbox>
         </HStack>
     )
