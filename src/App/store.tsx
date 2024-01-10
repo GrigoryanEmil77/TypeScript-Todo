@@ -1,12 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit';
-import todoReducer from '../features/todoSlice';
+import { configureStore, } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import { todosApi } from '../features/todoSlice';
+
 
 export const store = configureStore({
   reducer: {
-    todo: todoReducer,
+    [todosApi.reducerPath]: todosApi.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(todosApi.middleware),
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
-
+setupListeners(store.dispatch);

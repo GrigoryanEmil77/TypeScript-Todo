@@ -1,36 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button,  Checkbox,  CloseButton, ListItem, OrderedList,
-     HStack,Stack, Text, Textarea, } from "@chakra-ui/react"
-import { useDispatch, useSelector } from "react-redux";
-import { fetchTodo, addTodo,completedTodo, deleteTodo} from '../features/todoSlice';
-import { RootState} from "../App/store";
-
+         HStack,Stack, Text, Textarea, } from "@chakra-ui/react"
+import { useAddTodoMutation,useGetTodosQuery } from '../features/todoSlice';
 
 function TodoList(){
 
-    const dispatch  = useDispatch();
-    const todos = useSelector((state: RootState) => state.todo.todos)
-    const [textInput,setTextInput] = useState('');
+  const {data:todos = []} = useGetTodosQuery({limit:15})
+  const [addTodo] = useAddTodoMutation()
+  const [textInput,setTextInput] = useState('');
 
-    useEffect(() => {
-      dispatch(fetchTodo(10) as any); 
-    }, [dispatch]);
-  
-    const handleAddTodo = () => {
-      if(textInput.trim() !== ""){
-          dispatch(addTodo(textInput.trim()));
+
+    const handleAddTodo =  async () => {
+      if(textInput.trim() !== ""){   
+          await addTodo({title:textInput,completed:false});
           setTextInput('')
       }
     };
-  
-    const handleCompletedTodo = (id: number) => {
-      dispatch(completedTodo(id));
-    };
-  
-    const handleDeleteTodo = (id: number) => {
-      dispatch(deleteTodo(id));
-    };
-
+   
    
     return(
         
@@ -56,7 +42,7 @@ function TodoList(){
         <ListItem style = {{ textDecoration: todo.completed ? 'line-through' : 'none',fontSize:"2.5rem" }} >
           {todo.title}</ListItem>
         <CloseButton  color='whiteSmoke' background='teal' fontSize="2rem" 
-         onClick={() => handleDeleteTodo(todo.id)}></CloseButton>
+        ></CloseButton>
         <Checkbox
         _checked={{
        
@@ -64,7 +50,6 @@ function TodoList(){
         color="red"
         fontSize="2rem"
         isChecked={todo.completed}
-        onChange={() => handleCompletedTodo(todo.id)}
         >
        <Text color='blue'>Checked</Text>
     </Checkbox>
